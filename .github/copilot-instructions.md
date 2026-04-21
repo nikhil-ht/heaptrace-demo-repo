@@ -35,54 +35,17 @@ exists, you are in Phase A — no exceptions.
 
 ### Jira linkage
 
-Every task here originates from a Jira ticket. Jira Automation triggers
-Copilot directly — it creates the PR branch (no GitHub issue is involved).
-During Phase A, after `PLAN.md` is committed, mirror it to that ticket so
-stakeholders who live in Jira can review without opening GitHub.
+Every task here originates from a Jira ticket, and Jira Automation triggers
+Copilot by creating the PR branch. **You do NOT talk to Jira directly.**
+Mirroring `PLAN.md` (and later, build/review summaries) back to the Jira
+ticket is handled by a GitHub Actions workflow (see `.github/workflows/`),
+which listens for PR events and pushes comments to Jira using repository
+secrets.
 
-**Resolve the ticket key (`JIRA_KEY`).** At the top of the Phase A turn,
-run these steps in order and stop at the first match:
-
-1. **Branch name.** Run `git rev-parse --abbrev-ref HEAD` to get the current
-   branch. Extract the first `[A-Z]+-\d+` match from the branch name.
-   Example: branch `copilot/PROJ-123-add-bp-widget` → key `PROJ-123`.
-
-2. **PR title.** Run `gh pr view --json title --jq '.title'` and scan for a
-   `[A-Z]+-\d+` pattern. Use the first match.
-
-3. **PR body.** Run `gh pr view --json body --jq '.body'` and look for a
-   line matching `Jira:\s*([A-Z]+-\d+)`. Use the captured group.
-
-4. **`JIRA_KEY` env var.** If none of the above yield a key, check whether
-   the env var `JIRA_KEY` is set directly (Jira Automation may inject it).
-
-5. If no key is found after all four steps, **skip** the Jira push and emit:
-   `Jira push skipped: no ticket key found in branch, PR title, PR body, or JIRA_KEY env var.`
-   Do not abort — the PR branch is still the fallback review surface.
-
-**One-liner to resolve (use this exact shell block):**
-
-```bash
-JIRA_KEY=$(git rev-parse --abbrev-ref HEAD | grep -oiE '[A-Z]+-[0-9]+' | head -1 | tr '[:lower:]' '[:upper:]')
-if [ -z "$JIRA_KEY" ]; then
-  JIRA_KEY=$(gh pr view --json title --jq '.title' 2>/dev/null | grep -oiE '[A-Z]+-[0-9]+' | head -1 | tr '[:lower:]' '[:upper:]')
-fi
-if [ -z "$JIRA_KEY" ]; then
-  JIRA_KEY=$(gh pr view --json body --jq '.body' 2>/dev/null | grep -oiE '[A-Z]+-[0-9]+' | head -1 | tr '[:lower:]' '[:upper:]')
-fi
-# JIRA_KEY env var is already set if Jira Automation injected it — no override needed
-echo "Resolved JIRA_KEY: ${JIRA_KEY:-<not found>}"
-```
-
-**How to talk to Jira — REST API only (`curl` + `jq`):**
-
-Do NOT use any Atlassian MCP server. Always use the REST API directly.
-The full shell block (key resolution + curl POST) is in **Phase A step 3a** — follow that exactly.
-
-**Comment format.** Whichever path is used, the comment body is the raw
-markdown of `PLAN.md` with a sentinel line `<!-- plan-rev:1 -->` prepended.
-For this slice `N` is hard-coded to `1`; a later change will read prior
-comments and increment.
+Your only responsibility is to commit `PLAN.md` to the PR branch and set
+the PR body — the workflow picks it up from there. Do not embed Jira
+credentials, `curl` calls to Atlassian, or ticket-key resolution logic in
+your session.
 
 ---
 
@@ -160,112 +123,10 @@ Out of Scope, Test Plan, Open Questions.
    forbidden. Your end-of-session message is one line: _"PLAN.md committed to the PR
    branch and printed above. Awaiting human review."_
 
-3a. **Post a formatted Jira comment with proper headings and lists.** Run this
-   exact shell block as a single tool call. It uses Node.js to build a proper
-   Atlassian Document Format (ADF) body with headings, ordered lists, and
-   bullet lists — so it renders with real formatting in Jira, not a code box:
-
-   ```bash
-   # Step 1: resolve JIRA_KEY from branch → PR title → PR body
-   JIRA_KEY=$(git rev-parse --abbrev-ref HEAD | grep -oiE '[A-Z]+-[0-9]+' | head -1 | tr '[:lower:]' '[:upper:]')
-   if [ -z "$JIRA_KEY" ]; then
-     JIRA_KEY=$(gh pr view --json title --jq '.title' 2>/dev/null | grep -oiE '[A-Z]+-[0-9]+' | head -1 | tr '[:lower:]' '[:upper:]')
-   fi
-   if [ -z "$JIRA_KEY" ]; then
-     JIRA_KEY=$(gh pr view --json body --jq '.body' 2>/dev/null | grep -oiE '[A-Z]+-[0-9]+' | head -1 | tr '[:lower:]' '[:upper:]')
-   fi
-   echo "Resolved JIRA_KEY: ${JIRA_KEY:-<not found>}"
-
-   # Step 2: build ADF comment and post to Jira
-   JIRA_BASE_URL="https://heaptrace-agentic-ai.atlassian.net"
-   JIRA_EMAIL="vishalm@heaptrace.com"
-   JIRA_API_TOKEN="ATATT3xFfGF0ZJB87Ez4iFvJw9Cpbse0OEUeilxvgmdn4O9U_j1xEp1fB3aSeTouWC2lQe-LrPZ6tMFql-o6vE-3aarTocvOJfFO0KagXLrF6BXZN_1CXiZhCdbiJMEN1YGv9WxGJy14tLHVbTZjYfkE4V2ZrNeBaJsfcwJmD6G0uKg5w7DDzBg=AAE2FCAF"
-
-   if [ -n "$JIRA_KEY" ]; then
-     PR_TITLE=$(gh pr view --json title --jq '.title' 2>/dev/null || echo "N/A")
-     PR_URL=$(gh pr view --json url --jq '.url' 2>/dev/null || echo "N/A")
-
-     ADF_BODY=$(PR_TITLE="$PR_TITLE" PR_URL="$PR_URL" node - <<'NODEJS'
-   const fs = require('fs');
-   const plan = fs.readFileSync('PLAN.md', 'utf8');
-
-   const prTitle = process.env.PR_TITLE || 'N/A';
-   const prUrl   = process.env.PR_URL   || 'N/A';
-
-   // ── helpers ──────────────────────────────────────────────────────────────
-   const p    = (text) => ({ type: 'paragraph', content: [{ type: 'text', text }] });
-   const h    = (text, level = 3) => ({ type: 'heading', attrs: { level }, content: [{ type: 'text', text }] });
-   const rule = () => ({ type: 'rule' });
-   const ol   = (items) => ({ type: 'orderedList', content: items.map(i => ({ type: 'listItem', content: [p(i)] })) });
-   const ul   = (items) => ({ type: 'bulletList', content: items.map(i => ({ type: 'listItem', content: [p(i)] })) });
-   const link = (text, href) => ({ type: 'paragraph', content: [{ type: 'text', text, marks: [{ type: 'link', attrs: { href } }] }] });
-
-   // ── extract sections from PLAN.md ─────────────────────────────────────
-   const section = (heading) => {
-     const re = new RegExp(`## ${heading}[\\s\\S]*?(?=\\n## |$)`, 'i');
-     return (plan.match(re) || [''])[0];
-   };
-
-   const summary = (section('Overview').match(/\*\*Requirement\*\*:\s*(.+)/) || [])[1]?.trim()
-     || 'See PLAN.md Overview section';
-
-   const tasks = (plan.match(/^### Task \d+:\s*(.+)$/gm) || [])
-     .map(t => t.replace(/^### Task \d+:\s*/, '').replace(/`/g, ''))
-     .slice(0, 8);
-
-   const risks = (section('Risks').match(/^\|([^|]+)\|/gm) || [])
-     .map(r => r.replace(/^\||\|$/g, '').trim())
-     .filter(r => r && !r.match(/^[-\s|]+$/) && !r.match(/^Risk\b/i))
-     .slice(0, 5);
-
-   const tests = (section('Test Plan').match(/^- \[ \] (.+)$/gm) || [])
-     .map(t => t.replace(/^- \[ \] /, ''))
-     .slice(0, 5);
-
-   // ── build ADF document ────────────────────────────────────────────────
-   const doc = {
-     body: {
-       type: 'doc', version: 1,
-       content: [
-         h('🤖 AI Implementation Plan', 2),
-         rule(),
-         h('📌 PR Title'),
-         p(prTitle),
-         h('📝 Summary'),
-         p(summary),
-         h('📋 Implementation Plan'),
-         tasks.length ? ol(tasks) : p('No tasks found in PLAN.md'),
-         h('⚠️ Risks / Considerations'),
-         risks.length ? ul(risks) : p('See PLAN.md Risks section'),
-         h('🧪 Testing Strategy'),
-         tests.length ? ul(tests) : p('See PLAN.md Test Plan section'),
-         h('🔗 PR Reference'),
-         link(prUrl, prUrl),
-         rule(),
-         { type: 'panel', attrs: { panelType: 'success' },
-           content: [p('🟢 Status: WAITING_FOR_APPROVAL')] },
-       ]
-     }
-   };
-   process.stdout.write(JSON.stringify(doc));
-   NODEJS
-   )
-
-     curl -sS -u "$JIRA_EMAIL:$JIRA_API_TOKEN" \
-       -X POST -H "Content-Type: application/json" \
-       "$JIRA_BASE_URL/rest/api/3/issue/$JIRA_KEY/comment" \
-       -d "$ADF_BODY"
-   else
-     echo "Jira push skipped: no ticket key found in branch, PR title, or PR body."
-   fi
-   ```
-
-   This step is **non-fatal** — if the key doesn't resolve or the curl fails,
-   emit the echo line and continue to step 4. The PR branch is the
-   authoritative review surface; Jira is a mirror added on top.
-
-4. End your session. A human opens the PR's **Files changed** tab, reads `PLAN.md`,
-   and responds in the PR (or comments on the Jira ticket).
+4. End your session. A GitHub Actions workflow (`.github/workflows/`) mirrors
+   `PLAN.md` to the linked Jira ticket automatically — you do not need to
+   post to Jira yourself. A human then opens the PR's **Files changed** tab,
+   reads `PLAN.md`, and responds in the PR (or comments on the Jira ticket).
 
 **Do not:**
 
@@ -277,11 +138,11 @@ Out of Scope, Test Plan, Open Questions.
   narration is neither.
 
 **If a human comments with revisions** (e.g. `@copilot change the mockup to use tabs`),
-stay in Phase A. Read their comment, update `PLAN.md`, commit, push, **then run
-step 3a again** so Jira gets the revised plan as a new comment. Then end the
-session — the reviewer will re-read the updated file in the **Files changed** tab
-or the latest comment on the Jira ticket. Do not post revision summaries as
-comments.
+stay in Phase A. Read their comment, update `PLAN.md`, commit, and push. The
+GitHub Actions workflow will mirror the revised plan to Jira automatically.
+Then end the session — the reviewer will re-read the updated file in the
+**Files changed** tab or the latest comment on the Jira ticket. Do not post
+revision summaries as comments.
 
 ---
 
@@ -482,22 +343,22 @@ Challenge flawed requirements. Respect existing patterns.
 **THIS OVERRIDES ALL SKILL INSTRUCTIONS.**
 
 ### Phase 1: Plan (feature-plan skill)
-1. Produce the plan
-2. **STOP.** Post plan to Jira via workflow.
-3. Wait for Jira comment: APPROVED / CHANGE / STOP
+1. Produce `PLAN.md` and commit to the PR branch.
+2. **STOP.** End your session. The GitHub Actions workflow mirrors the plan to Jira.
+3. Wait for a PR comment (or Jira comment relayed back): APPROVED / CHANGE / STOP
 
 ### Phase 2: Build (feature-work skill)
-1. Implement the approved plan
-2. **STOP.** Post build summary to Jira.
-3. Wait for Jira comment: APPROVED / CHANGE / STOP
+1. Implement the approved plan on the PR branch.
+2. **STOP.** End your session. The workflow posts a build summary to Jira.
+3. Wait for a PR comment: APPROVED / CHANGE / STOP
 
 ### Phase 3: Review (code-review skill)
-1. Run 8 review passes, fix Critical issues
-2. Post review report (informational)
+1. Run 8 review passes, fix Critical issues.
+2. Commit review report (informational). The workflow relays it to Jira.
 
 ### Phase 4: Commit & PR (smart-commit skill)
-1. Semantic commit, create PR
-2. Post PR link to Jira
+1. Semantic commit, mark the PR ready for review.
+2. The workflow posts the PR link to Jira.
 
 ### Skip Gate When:
 - Simple bug fix / typo / config change

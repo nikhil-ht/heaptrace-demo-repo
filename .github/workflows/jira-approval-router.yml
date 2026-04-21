@@ -1,0 +1,56 @@
+name: "Route Jira Approval to Copilot"
+
+on:
+  repository_dispatch:
+    types: [jira-approval]
+
+jobs:
+  route-to-copilot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Find PR matching Jira key
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const jiraKey = context.payload.client_payload.issue_key;
+            const comment = context.payload.client_payload.comment;
+            const author = context.payload.client_payload.comment_author;
+
+            // Find open PRs with the Jira key in the title
+            const pulls = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 50
+            });
+
+            const pr = pulls.data.find(p => p.title.includes(jiraKey));
+            if (!pr) {
+              console.log(`No open PR found for ${jiraKey}`);
+              return;
+            }
+
+            console.log(`Found PR #${pr.number} for ${jiraKey}`);
+
+            // Determine what to tell Copilot
+            let copilotMessage = '';
+            const upperComment = comment.toUpperCase().trim();
+
+            if (upperComment.startsWith('APPROVED')) {
+              copilotMessage = `@copilot The plan has been approved by ${author} on Jira (${jiraKey}). Proceed with implementation. Follow the feature-work skill. Run tests. Open the PR for review when done.`;
+            } else if (upperComment.startsWith('CHANGE')) {
+              copilotMessage = `@copilot The developer requested changes on Jira (${jiraKey}):\n\n> ${comment}\n\nRevise the plan based on this feedback. Update plan.md. Do NOT start implementation yet.`;
+            } else if (upperComment.startsWith('STOP')) {
+              copilotMessage = `@copilot The developer said STOP on Jira (${jiraKey}). Do not implement. Close this PR.`;
+            }
+
+            if (copilotMessage) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: copilotMessage
+              });
+              console.log(`Posted to PR #${pr.number}: ${copilotMessage.substring(0, 100)}...`);
+            }
