@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:docs.github.com)",
+      "WebSearch",
+      "Bash(curl -s https://raw.githubusercontent.com/HeaptraceTechnologyCollection/agentic-demo-v1/main/.github/copilot-instructions.md)",
+      "Bash(curl -s https://raw.githubusercontent.com/HeaptraceTechnologyCollection/agentic-demo-v1/main/AGENTS.md)",
+      "Bash(curl -s https://raw.githubusercontent.com/HeaptraceTechnologyCollection/agentic-demo-v1/main/.github/workflows/copilot-setup-steps.yml)",
+      "Bash(curl -s https://api.github.com/repos/HeaptraceTechnologyCollection/agentic-demo-v1/contents/.github/skills)",
+      "Bash(curl -s https://raw.githubusercontent.com/HeaptraceTechnologyCollection/agentic-demo-v1/main/.github/skills/feature-plan/SKILL.md)",
+      "Bash(curl -s https://api.github.com/repos/HeaptraceTechnologyCollection/agentic-demo-v1/contents/.github)",
+      "Bash(curl -s https://api.github.com/repos/HeaptraceTechnologyCollection/agentic-demo-v1/contents/.github/workflows)",
+      "Bash(curl -s https://api.github.com/repos/HeaptraceTechnologyCollection/agentic-demo-v1/contents/)"
+    ]
+  }
+}
