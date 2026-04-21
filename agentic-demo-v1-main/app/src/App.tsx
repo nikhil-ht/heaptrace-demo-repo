@@ -9,10 +9,10 @@ const footerLinks = [
   { label: 'Terms of Service', to: '/terms-of-service' },
   { label: 'Help/Support', to: '/help-support' },
 ];
+const APP_VERSION = '0.1.0';
+const CURRENT_YEAR = new Date().getFullYear();
 
 export default function App() {
-  const currentYear = new Date().getFullYear();
-
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', display: 'flex', flexDirection: 'column' }}>
       <AppBar position="static" color="primary" elevation={1}>
@@ -73,7 +73,7 @@ export default function App() {
             }}
           >
             <Typography variant="body2" color="text.secondary">
-              Hypertension Dashboard v0.1.0 © {currentYear} Heaptrace
+              Hypertension Dashboard v{APP_VERSION} © {CURRENT_YEAR} Heaptrace
             </Typography>
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
               {footerLinks.map((item) => (
