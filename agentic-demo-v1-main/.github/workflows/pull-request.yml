@@ -1,0 +1,45 @@
+name: Pull Request
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: 20.x
+
+jobs:
+  build:
+    name: Type-check and Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify FHIR fixtures regenerate cleanly
+        run: |
+          node server/scripts/generate-fixtures.js
+          node server/scripts/build-anole-bundle.js
+
+      - name: Build app (tsc + vite)
+        run: npm --workspace app run build
+
+      - name: Smoke-test backend boot
+        run: |
+          PORT=4100 npm --workspace server run start &
+          SERVER_PID=$!
+          sleep 2
+          curl -fsS http://localhost:4100/health
+          curl -fsS http://localhost:4100/fhir/Patient > /dev/null
+          kill $SERVER_PID

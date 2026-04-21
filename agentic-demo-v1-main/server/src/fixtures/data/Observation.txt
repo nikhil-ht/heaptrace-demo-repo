@@ -1,0 +1,316 @@
+{
+    "resourceType": "Bundle",
+    "type": "searchset",
+    "entry": [
+        {
+            "resource": {
+                "resourceType": "Observation",
+                "id": "218a3c50-f37d-4a9f-bf97-549385dfe246",
+                "meta": {
+                    "versionId": "1",
+                    "lastUpdated": "2026-04-09T17:32:45.032+00:00",
+                    "source": "#iVgag9Bw7lW6Mj7z"
+                },
+                "extension": [
+                    {
+                        "url": "http://elimu.io/tag/name/valueset",
+                        "valueString": "SerumPotassium"
+                    },
+                    {
+                        "url": "http://elimu.io/tag/name/preferred-name",
+                        "valueString": "K"
+                    },
+                    {
+                        "url": "http://elimu.io/tag/name/class",
+                        "valueString": "CHEM"
+                    }
+                ],
+                "status": "final",
+                "category": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                                "code": "laboratory",
+                                "display": "laboratory"
+                            }
+                        ],
+                        "text": "laboratory"
+                    }
+                ],
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "77142-8",
+                            "display": "Potassium [Moles/volume] in Serum, Plasma or Blood"
+                        }
+                    ],
+                    "text": "Potassium [Moles/volume] in Serum, Plasma or Blood"
+                },
+                "subject": {
+                    "reference": "Patient/sapphire-demo-patient-anole-persimmon"
+                },
+                "encounter": {
+                    "reference": "Encounter/sapphire-demo-encounter-anole-persimmon"
+                },
+                "effectiveDateTime": "2026-03-05T17:32:36.613+00:00",
+                "issued": "2026-03-05T17:32:36.613+00:00",
+                "valueQuantity": {
+                    "value": 4.2,
+                    "unit": "mmol/L",
+                    "system": "http://unitsofmeasure.org",
+                    "code": "mmol/L"
+                }
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "Observation",
+                "id": "d77dac17-7350-4570-8ed8-e34d18c6c563",
+                "meta": {
+                    "versionId": "1",
+                    "lastUpdated": "2026-04-09T17:32:45.032+00:00",
+                    "source": "#iVgag9Bw7lW6Mj7z"
+                },
+                "extension": [
+                    {
+                        "url": "http://elimu.io/tag/name/valueset",
+                        "valueString": "SerumPotassium"
+                    },
+                    {
+                        "url": "http://elimu.io/tag/name/preferred-name",
+                        "valueString": "K"
+                    },
+                    {
+                        "url": "http://elimu.io/tag/name/class",
+                        "valueString": "CHEM"
+                    }
+                ],
+                "status": "final",
+                "category": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                                "code": "laboratory",
+                                "display": "laboratory"
+                            }
+                        ],
+                        "text": "laboratory"
+                    }
+                ],
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "77142-8",
+                            "display": "Potassium [Moles/volume] in Serum, Plasma or Blood"
+                        }
+                    ],
+                    "text": "Potassium [Moles/volume] in Serum, Plasma or Blood"
+                },
+                "subject": {
+                    "reference": "Patient/sapphire-demo-patient-anole-persimmon"
+                },
+                "encounter": {
+                    "reference": "Encounter/267ac3fb-7582-4824-a08c-94b8652e54a2"
+                },
+                "effectiveDateTime": "2026-02-08T17:32:36.613+00:00",
+                "issued": "2026-02-08T17:32:36.613+00:00",
+                "valueQuantity": {
+                    "value": 4.3,
+                    "unit": "mmol/L",
+                    "system": "http://unitsofmeasure.org",
+                    "code": "mmol/L"
+                }
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "Observation",
+                "id": "f83d791a-e3a6-4455-89be-1e31059a937f",
+                "meta": {
+                    "versionId": "1",
+                    "lastUpdated": "2026-04-09T17:32:45.032+00:00",
+                    "source": "#iVgag9Bw7lW6Mj7z"
+                },
+                "extension": [
+                    {
+                        "url": "http://elimu.io/tag/name/valueset",
+                        "valueString": "SerumPotassium"
+                    },
+                    {
+                        "url": "http://elimu.io/tag/name/preferred-name",
+                        "valueString": "K"
+                    },
+                    {
+                        "url": "http://elimu.io/tag/name/class",
+                        "valueString": "CHEM"
+                    }
+                ],
+                "status": "final",
+                "category": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                                "code": "laboratory",
+                                "display": "laboratory"
+                            }
+                        ],
+                        "text": "laboratory"
+                    }
+                ],
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "77142-8",
+                            "display": "Potassium [Moles/volume] in Serum, Plasma or Blood"
+                        }
+                    ],
+                    "text": "Potassium [Moles/volume] in Serum, Plasma or Blood"
+                },
+                "subject": {
+                    "reference": "Patient/sapphire-demo-patient-anole-persimmon"
+                },
+                "encounter": {
+                    "reference": "Encounter/c6c773d0-a263-4d90-b606-47180c280a9d"
+                },
+                "effectiveDateTime": "2025-12-30T17:32:36.613+00:00",
+                "issued": "2025-12-30T17:32:36.613+00:00",
+                "valueQuantity": {
+                    "value": 4.2,
+                    "unit": "mmol/L",
+                    "system": "http://unitsofmeasure.org",
+                    "code": "mmol/L"
+                }
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "Observation",
+                "id": "9ebb896c-eb5f-4f7d-9d93-88ed94c7d7a2",
+                "meta": {
+                    "versionId": "1",
+                    "lastUpdated": "2026-04-09T17:32:45.032+00:00",
+                    "source": "#iVgag9Bw7lW6Mj7z"
+                },
+                "extension": [
+                    {
+                        "url": "http://elimu.io/tag/name/valueset",
+                        "valueString": "SerumPotassium"
+                    },
+                    {
+                        "url": "http://elimu.io/tag/name/preferred-name",
+                        "valueString": "K"
+                    },
+                    {
+                        "url": "http://elimu.io/tag/name/class",
+                        "valueString": "CHEM"
+                    }
+                ],
+                "status": "final",
+                "category": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                                "code": "laboratory",
+                                "display": "laboratory"
+                            }
+                        ],
+                        "text": "laboratory"
+                    }
+                ],
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "77142-8",
+                            "display": "Potassium [Moles/volume] in Serum, Plasma or Blood"
+                        }
+                    ],
+                    "text": "Potassium [Moles/volume] in Serum, Plasma or Blood"
+                },
+                "subject": {
+                    "reference": "Patient/sapphire-demo-patient-anole-persimmon"
+                },
+                "encounter": {
+                    "reference": "Encounter/0bc34000-a560-4b8e-a53d-4ba12ff4de7a"
+                },
+                "effectiveDateTime": "2025-12-10T17:32:36.613+00:00",
+                "issued": "2025-12-10T17:32:36.613+00:00",
+                "valueQuantity": {
+                    "value": 4.6,
+                    "unit": "mmol/L",
+                    "system": "http://unitsofmeasure.org",
+                    "code": "mmol/L"
+                }
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "Observation",
+                "id": "bd298b2d-afaa-42d9-908c-40c6128675c8",
+                "meta": {
+                    "versionId": "1",
+                    "lastUpdated": "2026-04-09T17:32:45.032+00:00",
+                    "source": "#iVgag9Bw7lW6Mj7z"
+                },
+                "extension": [
+                    {
+                        "url": "http://elimu.io/tag/name/valueset",
+                        "valueString": "SerumPotassium"
+                    },
+                    {
+                        "url": "http://elimu.io/tag/name/preferred-name",
+                        "valueString": "K"
+                    },
+                    {
+                        "url": "http://elimu.io/tag/name/class",
+                        "valueString": "CHEM"
+                    }
+                ],
+                "status": "final",
+                "category": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                                "code": "laboratory",
+                                "display": "laboratory"
+                            }
+                        ],
+                        "text": "laboratory"
+                    }
+                ],
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "77142-8",
+                            "display": "Potassium [Moles/volume] in Serum, Plasma or Blood"
+                        }
+                    ],
+                    "text": "Potassium [Moles/volume] in Serum, Plasma or Blood"
+                },
+                "subject": {
+                    "reference": "Patient/sapphire-demo-patient-anole-persimmon"
+                },
+                "encounter": {
+                    "reference": "Encounter/ca36bce7-fb92-4503-9e4e-e13307f12f64"
+                },
+                "effectiveDateTime": "2025-03-05T17:32:36.613+00:00",
+                "issued": "2025-03-05T17:32:36.613+00:00",
+                "valueQuantity": {
+                    "value": 4.2,
+                    "unit": "mmol/L",
+                    "system": "http://unitsofmeasure.org",
+                    "code": "mmol/L"
+                }
+            }
+        }
+    ]
+}

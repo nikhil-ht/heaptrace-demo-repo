@@ -1,0 +1,48 @@
+# Copilot coding agent environment setup.
+# Job name MUST be exactly "copilot-setup-steps".
+
+name: "Copilot Setup Steps"
+on:
+  workflow_dispatch:
+  push:
+    paths: [".github/workflows/copilot-setup-steps.yml"]
+
+jobs:
+  copilot-setup-steps: # MUST be this exact name
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      # Do not rewrite remote.origin.fetch or fetch all heads here: that breaks some shallow
+      # agent clones. Best-effort only; missing copilot/* must not fail setup (e.g. runs from main).
+      - name: Fetch Copilot agent branches (optional)
+        run: |
+          git fetch origin '+refs/heads/copilot/*:refs/remotes/origin/copilot/*' || true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Regenerate FHIR fixtures
+        run: |
+          node server/scripts/generate-fixtures.js
+          node server/scripts/build-anole-bundle.js
+
+      - name: Build app
+        run: npm --workspace app run build
+
+      - name: Export Jira credentials for Copilot agent
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+        run: |
+          echo "JIRA_BASE_URL=$JIRA_BASE_URL" >> $GITHUB_ENV
+          echo "JIRA_EMAIL=$JIRA_USER_EMAIL" >> $GITHUB_ENV
+          echo "JIRA_API_TOKEN=$JIRA_API_TOKEN" >> $GITHUB_ENV

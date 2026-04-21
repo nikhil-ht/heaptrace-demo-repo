@@ -1,0 +1,36 @@
+{
+  "resourceType": "Practitioner",
+  "id": "sapphire-demo-practitioner",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2026-04-07T13:21:24.862+00:00",
+    "source": "#L8tdpRvJNfI0dVKf"
+  },
+  "identifier": [ {
+    "system": "http://elimu.io/mixpanel-ignore",
+    "value": "sapphire-test-practitioner"
+  } ],
+  "active": true,
+  "name": [ {
+    "family": "Practitioner",
+    "given": [ "Sapphire", "Demo" ],
+    "prefix": [ "Dr." ]
+  } ],
+  "telecom": [ {
+    "extension": [ {
+      "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-direct",
+      "valueBoolean": true
+    } ],
+    "system": "email",
+    "value": "sapphire-demo@elimu.io",
+    "use": "work"
+  } ],
+  "address": [ {
+    "line": [ "ROUTE 6,  P O BOX 1430" ],
+    "city": "WELLFLEET",
+    "state": "MA",
+    "postalCode": "026677402",
+    "country": "US"
+  } ],
+  "gender": "male"
+}
