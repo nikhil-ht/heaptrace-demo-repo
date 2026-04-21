@@ -8,6 +8,7 @@ on:
 jobs:
   post-plan-to-jira:
     runs-on: ubuntu-latest
+    environment: JIRA_API_TOKEN
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
