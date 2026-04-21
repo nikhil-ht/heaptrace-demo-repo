@@ -4,6 +4,12 @@ import MonitorHeartIcon from '@mui/icons-material/MonitorHeart';
 import PatientListPage from './pages/PatientListPage';
 import PatientDashboardPage from './pages/PatientDashboardPage';
 
+const footerLinks = [
+  { label: 'Privacy Policy', to: '/privacy-policy' },
+  { label: 'Terms of Service', to: '/terms-of-service' },
+  { label: 'Help/Support', to: '/help-support' },
+];
+
 export default function App() {
   const currentYear = new Date().getFullYear();
 
@@ -29,6 +35,18 @@ export default function App() {
         <Routes>
           <Route path="/" element={<PatientListPage />} />
           <Route path="/patients/:id" element={<PatientDashboardPage />} />
+          <Route
+            path="/privacy-policy"
+            element={<Typography variant="h5">Privacy Policy details coming soon.</Typography>}
+          />
+          <Route
+            path="/terms-of-service"
+            element={<Typography variant="h5">Terms of Service details coming soon.</Typography>}
+          />
+          <Route
+            path="/help-support"
+            element={<Typography variant="h5">Help and support information coming soon.</Typography>}
+          />
         </Routes>
       </Container>
       <Box
@@ -58,15 +76,18 @@ export default function App() {
               Hypertension Dashboard v0.1.0 © {currentYear} Heaptrace
             </Typography>
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-              <Link href="#" variant="body2" color="inherit" underline="hover">
-                Privacy Policy
-              </Link>
-              <Link href="#" variant="body2" color="inherit" underline="hover">
-                Terms of Service
-              </Link>
-              <Link href="#" variant="body2" color="inherit" underline="hover">
-                Help/Support
-              </Link>
+              {footerLinks.map((item) => (
+                <Link
+                  key={item.to}
+                  component={RouterLink}
+                  to={item.to}
+                  variant="body2"
+                  color="inherit"
+                  underline="hover"
+                >
+                  {item.label}
+                </Link>
+              ))}
             </Box>
           </Box>
         </Container>
