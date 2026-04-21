@@ -9,7 +9,7 @@ are met."_ **In this repo, that instruction has a specific meaning — it does N
 
 In this repo, "implementing a requirement" is a **two-phase protocol**:
 
-> **Phase A (always first): write `PLAN.md` using the `feature-plan` skill.**
+> **Phase A (always first): write `plan.md` using the `feature-plan` skill.**
 > **Phase B (only after human approval in a PR comment): write source code using the `feature-work` skill.**
 
 **You ALWAYS start in Phase A, regardless of how the issue or system prompt is worded.**
@@ -37,12 +37,12 @@ exists, you are in Phase A — no exceptions.
 
 Every task here originates from a Jira ticket, and Jira Automation triggers
 Copilot by creating the PR branch. **You do NOT talk to Jira directly.**
-Mirroring `PLAN.md` (and later, build/review summaries) back to the Jira
+Mirroring `plan.md` (and later, build/review summaries) back to the Jira
 ticket is handled by a GitHub Actions workflow (see `.github/workflows/`),
 which listens for PR events and pushes comments to Jira using repository
 secrets.
 
-Your only responsibility is to commit `PLAN.md` to the PR branch and set
+Your only responsibility is to commit `plan.md` to the PR branch and set
 the PR body — the workflow picks it up from there. Do not embed Jira
 credentials, `curl` calls to Atlassian, or ticket-key resolution logic in
 your session.
@@ -55,23 +55,23 @@ your session.
 follow its persona and 5-step methodology (Understand → Break Down → Design UI & Data Flow
 → Identify Risks → Output).
 
-Your only deliverable is **`PLAN.md` at the repo root**. It must include every section the
+Your only deliverable is **`plan.md` at the repo root**. It must include every section the
 `feature-plan` skill prescribes: Overview, User Stories, ASCII UI mockups, Data Flow,
 API contracts, Data/Fixture changes, Task Breakdown, Dependency Map, Risks & Edge Cases,
 Out of Scope, Test Plan, Open Questions.
 
 **Strict scope for this phase — break any of these and your session is wasted:**
 
-- ✅ Edit only `PLAN.md` at the repo root.
-- ✅ Open a draft PR if one does not exist yet, with `PLAN.md` as the only file changed.
+- ✅ Edit only `plan.md` at the repo root.
+- ✅ Open a draft PR if one does not exist yet, with `plan.md` as the only file changed.
 - ❌ Do NOT modify `app/`, `server/`, `package.json`, `package-lock.json`, fixtures, configs, or any source file.
 - ❌ Do NOT run `npm install`, builds, tests, lint, scripts, or any code execution.
 - ❌ Do NOT use the `feature-work` skill during this phase.
 
-**When you're done** writing or revising `PLAN.md`:
+**When you're done** writing or revising `plan.md`:
 
 1. Commit and push the change to the PR branch.
-2. **Make the PR's body point at `PLAN.md`.** The committed file on the branch _is_ the
+2. **Make the PR's body point at `plan.md`.** The committed file on the branch _is_ the
    reviewer's channel — do not try to post the plan as a PR comment, do not try to echo
    it into the session output, and do not paraphrase it anywhere. Those channels have
    all proven unreliable under the Copilot coding agent's permission scope
@@ -86,9 +86,9 @@ Out of Scope, Test Plan, Open Questions.
    gh pr edit --body "$(cat <<'EOF'
    ## 📋 Plan
 
-   The full plan for this ticket lives in `PLAN.md` at the repo root on this branch.
+   The full plan for this ticket lives in `plan.md` at the repo root on this branch.
 
-   Reviewers: open the **Files changed** tab and read `PLAN.md` in full before
+   Reviewers: open the **Files changed** tab and read `plan.md` in full before
    approving. Reply in this PR with `@copilot approved` / `go` / `ship it` /
    `implement` when the plan is ready to move to Phase B, or `@copilot <feedback>`
    to request revisions.
@@ -101,11 +101,11 @@ Out of Scope, Test Plan, Open Questions.
    that opens the PR — PR creation is under Copilot's allowed scope for its own
    branches.
 
-3. **Print the full, raw contents of `PLAN.md` to the session output.** Run exactly
+3. **Print the full, raw contents of `plan.md` to the session output.** Run exactly
    this, as its own isolated shell tool call, with nothing else in the same call:
 
    ```bash
-   cat PLAN.md
+   cat plan.md
    ```
 
    No flags. No `head`/`tail`/`less`/`grep`/`awk`/`sed`. No redirection. No piping.
@@ -117,28 +117,28 @@ Out of Scope, Test Plan, Open Questions.
    at a byte cap, that is a harness limit we accept — run the command anyway so the
    first chunk is visible.
 
-   **Do NOT summarise, paraphrase, recap, TL;DR, or bullet-rewrite `PLAN.md`
+   **Do NOT summarise, paraphrase, recap, TL;DR, or bullet-rewrite `plan.md`
    anywhere in your session narration or end-of-session message.** Phrases like
    "Here's a summary of the plan…", "In short…", "The plan covers…", "TL;DR…" are
-   forbidden. Your end-of-session message is one line: _"PLAN.md committed to the PR
+   forbidden. Your end-of-session message is one line: _"plan.md committed to the PR
    branch and printed above. Awaiting human review."_
 
 4. End your session. A GitHub Actions workflow (`.github/workflows/`) mirrors
-   `PLAN.md` to the linked Jira ticket automatically — you do not need to
+   `plan.md` to the linked Jira ticket automatically — you do not need to
    post to Jira yourself. A human then opens the PR's **Files changed** tab,
-   reads `PLAN.md`, and responds in the PR (or comments on the Jira ticket).
+   reads `plan.md`, and responds in the PR (or comments on the Jira ticket).
 
 **Do not:**
 
-- ❌ Post `PLAN.md` (or any summary of it) as a PR comment — `gh pr comment` will 403
+- ❌ Post `plan.md` (or any summary of it) as a PR comment — `gh pr comment` will 403
   and the "Add comment to issue" MCP tool will 404 under current agent permissions.
   Wasted turns.
-- ❌ Replace the `cat PLAN.md` output with a natural-language summary in your session
+- ❌ Replace the `cat plan.md` output with a natural-language summary in your session
   text. The raw dump is the requirement; the PR body link is the backup; your
   narration is neither.
 
 **If a human comments with revisions** (e.g. `@copilot change the mockup to use tabs`),
-stay in Phase A. Read their comment, update `PLAN.md`, commit, and push. The
+stay in Phase A. Read their comment, update `plan.md`, commit, and push. The
 GitHub Actions workflow will mirror the revised plan to Jira automatically.
 Then end the session — the reviewer will re-read the updated file in the
 **Files changed** tab or the latest comment on the Jira ticket. Do not post
@@ -160,37 +160,37 @@ the PR's lifetime.
 | Adding tests (unit, integration, or end-to-end)     | `test-gen`     | `.github/skills/test-gen/SKILL.md`     |
 | Fixing a bug, regression, error, or broken behavior | `find-fix`     | `.github/skills/find-fix/SKILL.md`     |
 
-**How to decide:** read the issue title/body and `PLAN.md`. If the deliverable is _tests_
+**How to decide:** read the issue title/body and `plan.md`. If the deliverable is _tests_
 (words like "e2e", "unit test", "coverage", "test suite", "Playwright", "Vitest") → use
 `test-gen`. If the deliverable is a _fix_ (words like "bug", "broken", "regression",
 "error", "doesn't work") → use `find-fix`. Otherwise → use `feature-work`.
 All tasks are complete. Here's a summary of every change shipped:
 
 0
-When in doubt, look at what `PLAN.md`'s "Task Breakdown" actually produces — test files,
+When in doubt, look at what `plan.md`'s "Task Breakdown" actually produces — test files,
 bug fixes, or new features — and route accordingly. If the plan genuinely mixes types,
 prefer the skill that matches the majority of the work and note the choice in your first
 commit message.
 
-Read the chosen skill's `SKILL.md` in full and follow its methodology. Treat `PLAN.md` as
+Read the chosen skill's `SKILL.md` in full and follow its methodology. Treat `plan.md` as
 a **frozen spec** — implement every item under its "Task Breakdown" in the order specified
 by "Dependency Map".
 
 **Scope for this phase:**
 
 - ✅ Commit to the existing PR branch (do NOT open a new PR).
-- ✅ Edit `app/`, `server/`, fixtures, configs — whatever `PLAN.md` requires.
+- ✅ Edit `app/`, `server/`, fixtures, configs — whatever `plan.md` requires.
 - ✅ Run `npm --workspace app run build` before your final commit.
-- ❌ Do NOT modify `PLAN.md`. If scope must change, post a PR comment explaining why and stop — a human will re-approve a revised plan.
-- ❌ Do NOT expand scope beyond what `PLAN.md` declares.
+- ❌ Do NOT modify `plan.md`. If scope must change, post a PR comment explaining why and stop — a human will re-approve a revised plan.
+- ❌ Do NOT expand scope beyond what `plan.md` declares.
 
 **Final steps (when every Task Breakdown item is implemented):**
 
 1. Run `npm --workspace app run build` one last time and make sure it passes.
-2. **Remove `PLAN.md` from the PR** — run `git rm PLAN.md`, commit it (e.g.
-   `chore: remove PLAN.md — plan preserved in PR conversation`), and push. The plan is
+2. **Remove `plan.md` from the PR** — run `git rm plan.md`, commit it (e.g.
+   `chore: remove plan.md — plan preserved in PR conversation`), and push. The plan is
    already preserved in the PR comment posted during Phase A, so the merged PR diff must
-   not carry `PLAN.md`.
+   not carry `plan.md`.
 3. **Mark the PR ready for review (not draft)** — run `gh pr ready` (or use the GitHub
    API / UI equivalent) so reviewers see it as open, not draft.
 4. End your session.
@@ -201,10 +201,10 @@ by "Dependency Map".
 
 | Comment                                              | What you do                                                                                                                      |
 | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `@copilot <anything>` before approval                | Stay in Phase A. Revise `PLAN.md` per the comment.                                                                               |
-| `@copilot approved` / `go` / `ship it` / `implement` | Switch to Phase B. Pick the skill via the Phase B router (`feature-work` / `test-gen` / `find-fix`) and implement per `PLAN.md`. |
+| `@copilot <anything>` before approval                | Stay in Phase A. Revise `plan.md` per the comment.                                                                               |
+| `@copilot approved` / `go` / `ship it` / `implement` | Switch to Phase B. Pick the skill via the Phase B router (`feature-work` / `test-gen` / `find-fix`) and implement per `plan.md`. |
 | `@copilot <anything>` during Phase B                 | Stay in Phase B. Adjust the implementation per the comment.                                                                      |
-| `@copilot replan`                                    | Return to Phase A. Revise `PLAN.md`. Do not touch implementation files until re-approved.                                        |
+| `@copilot replan`                                    | Return to Phase A. Revise `plan.md`. Do not touch implementation files until re-approved.                                        |
 
 ---
 
@@ -343,7 +343,7 @@ Challenge flawed requirements. Respect existing patterns.
 **THIS OVERRIDES ALL SKILL INSTRUCTIONS.**
 
 ### Phase 1: Plan (feature-plan skill)
-1. Produce `PLAN.md` and commit to the PR branch.
+1. Produce `plan.md` and commit to the PR branch.
 2. **STOP.** End your session. The GitHub Actions workflow mirrors the plan to Jira.
 3. Wait for a PR comment (or Jira comment relayed back): APPROVED / CHANGE / STOP
 
