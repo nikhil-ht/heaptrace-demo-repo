@@ -14,6 +14,17 @@ Clinician dashboard for hypertensive patients, backed by a mock FHIR server. npm
 - Frontend talks to the backend via the Vite `/fhir/*` proxy — do not hardcode `http://localhost:4100`.
 - All features must have tests (once a test runner is added).
 
+## Skills
+
+Custom skills are defined in `.github/skills/`. When a user invokes a skill by name (e.g. "Use the feature-plan skill"), read the corresponding `SKILL.md` and follow its instructions exactly.
+
+| Skill name     | File                                      | Purpose                                      |
+| -------------- | ----------------------------------------- | -------------------------------------------- |
+| `feature-plan` | `.github/skills/feature-plan/SKILL.md`   | Plan a new feature — tasks, mockups, risks   |
+| `feature-work` | `.github/skills/feature-work/SKILL.md`   | Implement an approved feature plan           |
+| `find-fix`     | `.github/skills/find-fix/SKILL.md`       | Diagnose and fix a bug                       |
+| `test-gen`     | `.github/skills/test-gen/SKILL.md`       | Generate tests for existing code             |
+
 ## Required Before Commit
 - `npm run build` succeeds (runs `tsc -b` then `vite build`).
 - Both `npm run dev:server` and `npm run dev:app` start cleanly.
