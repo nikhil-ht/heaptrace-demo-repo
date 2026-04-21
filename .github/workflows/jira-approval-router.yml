@@ -4,6 +4,11 @@ on:
   repository_dispatch:
     types: [jira-approval]
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
 jobs:
   route-to-copilot:
     runs-on: ubuntu-latest
