@@ -8,9 +8,11 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { useTheme } from '@mui/material/styles';
 import { format, parseISO } from 'date-fns';
 import WidgetCard from './WidgetCard';
 import ChartRangeSelector from '../ChartRangeSelector';
+import { getChartColors } from '../../theme';
 import { filterByRange, sortByDateAsc, type RangeKey } from '../../utils/fhir';
 
 interface LabPoint {
@@ -41,6 +43,8 @@ export default function LabTrendChart({
   referenceLine,
   yDomain,
 }: Props) {
+  const theme = useTheme();
+  const colors = getChartColors(theme);
   const data = filterByRange(sortByDateAsc(points), range).map((p) => ({
     ...p,
     label: format(parseISO(p.date), 'MMM yy'),
@@ -53,7 +57,7 @@ export default function LabTrendChart({
     >
       <ResponsiveContainer width="100%" height={230}>
         <LineChart data={data} margin={{ top: 10, right: 20, bottom: 0, left: -10 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
+          <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
           <XAxis dataKey="label" />
           <YAxis domain={yDomain ?? ['auto', 'auto']} unit={` ${unit}`} width={70} />
           <Tooltip formatter={(v: number) => `${v} ${unit}`} />
@@ -61,7 +65,7 @@ export default function LabTrendChart({
             <ReferenceArea
               y1={referenceBand.low}
               y2={referenceBand.high}
-              fill="#e8f5e9"
+              fill={colors.referenceBand}
               fillOpacity={0.6}
             />
           )}
@@ -69,7 +73,7 @@ export default function LabTrendChart({
             <Line
               type="linear"
               dataKey={() => referenceLine}
-              stroke="#f57c00"
+              stroke={colors.referenceLine}
               strokeDasharray="4 4"
               dot={false}
               legendType="none"
