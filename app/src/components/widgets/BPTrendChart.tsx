@@ -61,9 +61,25 @@ export default function BPTrendChart({ readings, range, onRangeChange }: Props) 
             labelStyle={{ color: theme.palette.text.secondary }}
           />
           <Legend wrapperStyle={{ color: theme.palette.text.primary }} />
-          <ReferenceLine y={130} stroke="#f57c00" strokeDasharray="4 4" label="Target SBP 130" />
-          <ReferenceLine y={80} stroke="#29b6f6" strokeDasharray="4 4" label="Target DBP 80" />
-          <Line type="monotone" dataKey="systolic" stroke="#ef5350" dot={{ r: 3 }} strokeWidth={2} />
+          <ReferenceLine
+            y={130}
+            stroke={theme.palette.warning.main}
+            strokeDasharray="4 4"
+            label="Target SBP 130"
+          />
+          <ReferenceLine
+            y={80}
+            stroke={theme.palette.info.main}
+            strokeDasharray="4 4"
+            label="Target DBP 80"
+          />
+          <Line
+            type="monotone"
+            dataKey="systolic"
+            stroke={theme.palette.error.main}
+            dot={{ r: 3 }}
+            strokeWidth={2}
+          />
           <Line type="monotone" dataKey="diastolic" stroke={theme.palette.primary.main} dot={{ r: 3 }} strokeWidth={2} />
         </LineChart>
       </ResponsiveContainer>
