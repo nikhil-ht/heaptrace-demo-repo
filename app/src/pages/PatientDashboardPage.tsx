@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Box, Grid, CircularProgress, Typography, Button } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {
   usePatient,
@@ -29,6 +30,7 @@ import LabTrendChart from '../components/widgets/LabTrendChart';
 import VitalSignsPanel from '../components/widgets/VitalSignsPanel';
 
 export default function PatientDashboardPage() {
+  const theme = useTheme();
   const { id = '' } = useParams();
   const [range, setRange] = useState<RangeKey>('1y');
 
@@ -134,7 +136,7 @@ export default function PatientDashboardPage() {
             points={kPoints}
             range={range}
             onRangeChange={setRange}
-            color="#6a1b9a"
+            color={theme.palette.mode === 'dark' ? '#ab47bc' : '#6a1b9a'}
             referenceBand={{ low: 3.5, high: 5.0 }}
             yDomain={[3, 6]}
           />
@@ -146,7 +148,7 @@ export default function PatientDashboardPage() {
             points={egfrPoints}
             range={range}
             onRangeChange={setRange}
-            color="#00897b"
+            color={theme.palette.secondary.main}
             referenceLine={60}
             yDomain={[20, 120]}
           />
@@ -159,7 +161,7 @@ export default function PatientDashboardPage() {
             points={weightPoints}
             range={range}
             onRangeChange={setRange}
-            color="#d84315"
+            color={theme.palette.warning.main}
             yDomain={['auto' as any, 'auto' as any]}
           />
         </Grid>

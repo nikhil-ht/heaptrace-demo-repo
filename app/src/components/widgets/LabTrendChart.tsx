@@ -9,6 +9,7 @@ import {
   YAxis,
 } from 'recharts';
 import { format, parseISO } from 'date-fns';
+import { useTheme } from '@mui/material/styles';
 import WidgetCard from './WidgetCard';
 import ChartRangeSelector from '../ChartRangeSelector';
 import { filterByRange, sortByDateAsc, type RangeKey } from '../../utils/fhir';
@@ -41,6 +42,7 @@ export default function LabTrendChart({
   referenceLine,
   yDomain,
 }: Props) {
+  const theme = useTheme();
   const data = filterByRange(sortByDateAsc(points), range).map((p) => ({
     ...p,
     label: format(parseISO(p.date), 'MMM yy'),
@@ -53,15 +55,34 @@ export default function LabTrendChart({
     >
       <ResponsiveContainer width="100%" height={230}>
         <LineChart data={data} margin={{ top: 10, right: 20, bottom: 0, left: -10 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-          <XAxis dataKey="label" />
-          <YAxis domain={yDomain ?? ['auto', 'auto']} unit={` ${unit}`} width={70} />
-          <Tooltip formatter={(v: number) => `${v} ${unit}`} />
+          <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
+          <XAxis
+            dataKey="label"
+            axisLine={{ stroke: theme.palette.divider }}
+            tickLine={{ stroke: theme.palette.divider }}
+            tick={{ fill: theme.palette.text.secondary }}
+          />
+          <YAxis
+            domain={yDomain ?? ['auto', 'auto']}
+            unit={` ${unit}`}
+            width={70}
+            axisLine={{ stroke: theme.palette.divider }}
+            tickLine={{ stroke: theme.palette.divider }}
+            tick={{ fill: theme.palette.text.secondary }}
+          />
+          <Tooltip
+            formatter={(v: number) => `${v} ${unit}`}
+            contentStyle={{
+              backgroundColor: theme.palette.background.paper,
+              borderColor: theme.palette.divider,
+            }}
+            labelStyle={{ color: theme.palette.text.secondary }}
+          />
           {referenceBand && (
             <ReferenceArea
               y1={referenceBand.low}
               y2={referenceBand.high}
-              fill="#e8f5e9"
+              fill={theme.palette.success.light}
               fillOpacity={0.6}
             />
           )}

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Box, Tooltip, Typography, Stack, Chip } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import {
   addMonths,
   differenceInMilliseconds,
@@ -14,17 +15,17 @@ interface Props {
   encounters: any[];
 }
 
-const classColor = (code?: string) => {
+const classColor = (code: string | undefined, mode: 'light' | 'dark') => {
   switch (code) {
     case 'EMER':
-      return '#c62828';
+      return mode === 'dark' ? '#ef5350' : '#c62828';
     case 'IMP':
     case 'ACUTE':
-      return '#6a1b9a';
+      return mode === 'dark' ? '#ab47bc' : '#6a1b9a';
     case 'AMB':
-      return '#1565c0';
+      return mode === 'dark' ? '#64b5f6' : '#1565c0';
     default:
-      return '#455a64';
+      return mode === 'dark' ? '#90a4ae' : '#455a64';
   }
 };
 
@@ -45,6 +46,8 @@ const ROW_HEIGHT = 36;
 const LEFT_COL = 210;
 
 export default function EncountersTimeline({ encounters }: Props) {
+  const theme = useTheme();
+  const mode = theme.palette.mode;
   const rows = useMemo(() => {
     return encounters
       .map((e) => {
@@ -76,12 +79,33 @@ export default function EncountersTimeline({ encounters }: Props) {
   const MIN_BAR_WIDTH = 2; // percent
 
   return (
-    <WidgetCard title="Encounters Timeline">
-      <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-        <Chip size="small" label="Ambulatory" sx={{ bgcolor: classColor('AMB'), color: 'white' }} />
-        <Chip size="small" label="ED" sx={{ bgcolor: classColor('EMER'), color: 'white' }} />
-        <Chip size="small" label="Inpatient" sx={{ bgcolor: classColor('IMP'), color: 'white' }} />
-      </Stack>
+      <WidgetCard title="Encounters Timeline">
+        <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
+          <Chip
+            size="small"
+            label="Ambulatory"
+            sx={{
+              bgcolor: classColor('AMB', mode),
+              color: theme.palette.getContrastText(classColor('AMB', mode)),
+            }}
+          />
+          <Chip
+            size="small"
+            label="ED"
+            sx={{
+              bgcolor: classColor('EMER', mode),
+              color: theme.palette.getContrastText(classColor('EMER', mode)),
+            }}
+          />
+          <Chip
+            size="small"
+            label="Inpatient"
+            sx={{
+              bgcolor: classColor('IMP', mode),
+              color: theme.palette.getContrastText(classColor('IMP', mode)),
+            }}
+          />
+        </Stack>
 
       <Box sx={{ display: 'flex' }}>
         <Box sx={{ width: LEFT_COL, flexShrink: 0 }}>
@@ -137,7 +161,7 @@ export default function EncountersTimeline({ encounters }: Props) {
             const left = pct(start);
             const rawWidth = pct(end) - left;
             const width = Math.max(MIN_BAR_WIDTH, rawWidth);
-            const color = classColor(e.class?.code);
+            const color = classColor(e.class?.code, mode);
             const tooltip = (
               <Box>
                 <Typography variant="subtitle2">{e.type?.[0]?.text ?? 'Encounter'}</Typography>
@@ -200,7 +224,11 @@ export default function EncountersTimeline({ encounters }: Props) {
                   >
                     <Typography
                       variant="caption"
-                      sx={{ color: 'white', fontWeight: 600, whiteSpace: 'nowrap' }}
+                      sx={{
+                        color: theme.palette.getContrastText(color),
+                        fontWeight: 600,
+                        whiteSpace: 'nowrap',
+                      }}
                     >
                       {format(start, 'MMM d')}
                     </Typography>
