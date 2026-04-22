@@ -80,7 +80,13 @@ export default function BPTrendChart({ readings, range, onRangeChange }: Props) 
             dot={{ r: 3 }}
             strokeWidth={2}
           />
-          <Line type="monotone" dataKey="diastolic" stroke={theme.palette.primary.main} dot={{ r: 3 }} strokeWidth={2} />
+          <Line
+            type="monotone"
+            dataKey="diastolic"
+            stroke={theme.palette.primary.main}
+            dot={{ r: 3 }}
+            strokeWidth={2}
+          />
         </LineChart>
       </ResponsiveContainer>
     </WidgetCard>
