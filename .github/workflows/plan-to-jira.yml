@@ -82,19 +82,80 @@ jobs:
         env:
           PR_URL: ${{ steps.findpr.outputs.url }}
         run: |
-          PLAN=$(python3 -c "
-          import json, os
+          PLAN=$(python3 <<'PY'
+          import json, os, re
+
           with open('/tmp/plan_content.txt') as f:
-              content = f.read()
-          msg = '🤖 *Copilot Agent — Feature Plan*\n\n'
-          msg += content
-          msg += '\n\n---\n'
-          msg += '✅ Reply *APPROVED* to proceed with implementation\n'
-          msg += '✏️ Reply *CHANGE: [your feedback]* to revise the plan\n'
-          msg += '🛑 Reply *STOP* to cancel\n'
-          msg += '\n_PR: ' + os.environ['PR_URL'] + '_'
+              md = f.read()
+
+          # ── Markdown → Jira wiki markup ─────────────────────────────────
+          # 1) Fenced code blocks (```lang ... ```) → {code:lang} ... {code}
+          #    Handle BEFORE other transforms so inner text isn't mangled.
+          def code_block(m):
+              lang = (m.group(1) or '').strip()
+              body = m.group(2)
+              return f"{{code:{lang}}}\n{body}{{code}}" if lang else f"{{code}}\n{body}{{code}}"
+          md = re.sub(r"```(\w*)\n(.*?)```", code_block, md, flags=re.DOTALL)
+
+          # 2) Inline code `foo` → {{foo}}
+          md = re.sub(r"`([^`\n]+)`", r"{{\1}}", md)
+
+          # 3) Headings: ## Title → h2. Title (up to h6)
+          for n in range(6, 0, -1):
+              md = re.sub(rf"^{'#'*n} (.+)$", rf"h{n}. \1", md, flags=re.MULTILINE)
+
+          # 4) Bold **x** → *x*, Italic _x_ stays, strikethrough ~~x~~ → -x-
+          md = re.sub(r"\*\*([^*\n]+)\*\*", r"*\1*", md)
+          md = re.sub(r"~~([^~\n]+)~~", r"-\1-", md)
+
+          # 5) Links [text](url) → [text|url]
+          md = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r"[\1|\2]", md)
+
+          # 6) Task list: - [ ] / - [x] → (x) / (/)
+          md = re.sub(r"^(\s*)- \[ \] ", r"\1(x) ", md, flags=re.MULTILINE)
+          md = re.sub(r"^(\s*)- \[x\] ", r"\1(/) ", md, flags=re.MULTILINE)
+
+          # 7) Bullet list: - item / * item → * item (Jira uses *)
+          md = re.sub(r"^(\s*)[-*] ", r"\1* ", md, flags=re.MULTILINE)
+
+          # 8) Markdown tables → Jira tables (||header|| and |cell|)
+          lines = md.split('\n')
+          out = []
+          i = 0
+          while i < len(lines):
+              line = lines[i]
+              # detect header row + separator row
+              if (re.match(r"^\|.+\|$", line) and i + 1 < len(lines)
+                      and re.match(r"^\|\s*:?-+:?\s*(\|\s*:?-+:?\s*)+\|$", lines[i + 1])):
+                  header_cells = [c.strip() for c in line.strip('|').split('|')]
+                  out.append('||' + '||'.join(header_cells) + '||')
+                  i += 2
+                  while i < len(lines) and re.match(r"^\|.+\|$", lines[i]):
+                      cells = [c.strip() for c in lines[i].strip('|').split('|')]
+                      out.append('|' + '|'.join(cells) + '|')
+                      i += 1
+                  continue
+              out.append(line)
+              i += 1
+          md = '\n'.join(out)
+
+          # 9) Horizontal rule --- → ----
+          md = re.sub(r"^---+$", "----", md, flags=re.MULTILINE)
+
+          # ── Wrap with header + approval footer ───────────────────────────
+          msg  = 'h2. 🤖 Copilot Agent — Feature Plan\n\n'
+          msg += md
+          msg += '\n\n----\n'
+          msg += '{panel:title=Next step|bgColor=#E3FCEF}\n'
+          msg += '(/) Reply *APPROVED* to proceed with implementation\n'
+          msg += '(!) Reply *CHANGE: [your feedback]* to revise the plan\n'
+          msg += '(x) Reply *STOP* to cancel\n'
+          msg += '{panel}\n'
+          msg += '\n_PR: [' + os.environ['PR_URL'] + '|' + os.environ['PR_URL'] + ']_'
+
           print(json.dumps(msg))
-          ")
+          PY
+          )
 
           curl -s -X POST \
             -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}" \
