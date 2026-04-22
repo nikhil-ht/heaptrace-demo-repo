@@ -12,11 +12,13 @@ permissions:
 jobs:
   route-to-copilot:
     runs-on: ubuntu-latest
+    environment: JIRA_API_TOKEN
     steps:
       - name: Find PR matching Jira key
         id: pr
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.COPILOT_TRIGGER_PAT }}
           script: |
             const jiraKey = context.payload.client_payload.issue_key;
             const comment = context.payload.client_payload.comment;
