@@ -3,11 +3,13 @@ import {
   Line,
   LineChart,
   ReferenceArea,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from 'recharts';
+import { alpha, useTheme } from '@mui/material/styles';
 import { format, parseISO } from 'date-fns';
 import WidgetCard from './WidgetCard';
 import ChartRangeSelector from '../ChartRangeSelector';
@@ -41,6 +43,9 @@ export default function LabTrendChart({
   referenceLine,
   yDomain,
 }: Props) {
+  const theme = useTheme();
+  const axisColor = theme.palette.text.secondary;
+
   const data = filterByRange(sortByDateAsc(points), range).map((p) => ({
     ...p,
     label: format(parseISO(p.date), 'MMM yy'),
@@ -53,26 +58,36 @@ export default function LabTrendChart({
     >
       <ResponsiveContainer width="100%" height={230}>
         <LineChart data={data} margin={{ top: 10, right: 20, bottom: 0, left: -10 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-          <XAxis dataKey="label" />
-          <YAxis domain={yDomain ?? ['auto', 'auto']} unit={` ${unit}`} width={70} />
-          <Tooltip formatter={(v: number) => `${v} ${unit}`} />
+          <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.8)} />
+          <XAxis dataKey="label" stroke={axisColor} tick={{ fill: axisColor }} />
+          <YAxis
+            domain={yDomain ?? ['auto', 'auto']}
+            unit={` ${unit}`}
+            width={70}
+            stroke={axisColor}
+            tick={{ fill: axisColor }}
+          />
+          <Tooltip
+            formatter={(v: number) => `${v} ${unit}`}
+            contentStyle={{
+              backgroundColor: theme.palette.background.paper,
+              borderColor: theme.palette.divider,
+              color: theme.palette.text.primary,
+            }}
+          />
           {referenceBand && (
             <ReferenceArea
               y1={referenceBand.low}
               y2={referenceBand.high}
-              fill="#e8f5e9"
-              fillOpacity={0.6}
+              fill={alpha(theme.palette.success.main, 0.18)}
             />
           )}
           {referenceLine != null && (
-            <Line
-              type="linear"
-              dataKey={() => referenceLine}
-              stroke="#f57c00"
+            <ReferenceLine
+              y={referenceLine}
+              stroke={theme.palette.warning.main}
               strokeDasharray="4 4"
-              dot={false}
-              legendType="none"
+              ifOverflow="extendDomain"
             />
           )}
           <Line type="monotone" dataKey="value" stroke={color} strokeWidth={2} dot={{ r: 3 }} />
